@@ -4,7 +4,7 @@ import random
 
 
 # generate unique code
-def genarate_unique_code():
+def generate_unique_code():
     length = 6
 
     while True:
@@ -16,7 +16,8 @@ def genarate_unique_code():
 
 # Create your models here.
 class Room(models.Model):
-    code = models.CharField(max_length=8, default="", unique=True)
+    code = models.CharField(
+        max_length=8, default=generate_unique_code, unique=True)
     host = models.CharField(max_length=50, unique=True)
     guest_can_pause = models.BooleanField(null=False, default=False)
     votes_to_skip = models.IntegerField(null=False, default=1)
