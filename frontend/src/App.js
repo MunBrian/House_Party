@@ -8,12 +8,14 @@ import Room from "./components/Room";
 const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route exact path="/" element={<Home />} />
-        <Route path="/create" element={<CreateRoomPage />} />
-        <Route exact path="/room/:roomCode" element={<Room />} />
-        <Route path="/join" element={<RoomJoinPage />} />
-      </Routes>
+      <div className="center">
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route path="/create" element={<CreateRoomPage />} />
+          <Route exact path="/room/:roomCode" element={<Room />} />
+          <Route path="/join" element={<RoomJoinPage />} />
+        </Routes>
+      </div>
     </Router>
   );
 };
