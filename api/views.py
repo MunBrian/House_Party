@@ -57,13 +57,45 @@ class CreateRoomView(APIView):
                 room.votes_to_skip = votes_to_skip
                 # update fields
                 room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
+                self.request.session['room_code'] = room.code
+                return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:
                 # create a new room
                 room = Room(host=host, guest_can_pause=guest_can_pause,
                             votes_to_skip=votes_to_skip)
                 room.save()
-
+                self.request.session['room_code'] = room.code
             return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
+
+
+# join room func
+class JoinRoom(APIView):
+    serializer_class = RoomSerializer
+    lookup_url_kwarg = 'code'
+
+    def post(self, request, format=None):
+        # check if user has active sesssion
+        if not self.request.session.exists(self.request.session.session_key):
+            # if not create a seesion
+            self.request.session.create()
+
+        # get code value from post request
+        code = request.data.get(self.lookup_url_kwarg)
+
+        # if code exists
+        if code != None:
+            # fetch room frm db
+            room_result = Room.objects.filter(code=code)
+            # if roome exists
+            if len(room_result) > 0:
+                # get room
+                room = room_result[0]
+                # make key 'room_code' to show that user in current session is in the room
+                self.request.session['room_code'] = code
+                return Response({'message': 'Room Joined!!'}, status=status.HTTP_200_OK)
+            return Response({'Bad Request': 'Invalid Room Code!!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'Bad Request': 'Invalid post data, did not find a code key '}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # get sepecific room

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { TextField, Button, Grid, Typography } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const RoomJoinPage = () => {
+  const navigate = useNavigate();
+
   const [roomCode, setRoomCode] = useState("");
   const [error, setError] = useState("");
 
@@ -11,7 +13,24 @@ const RoomJoinPage = () => {
   };
 
   const handleEnterRoom = async () => {
-    console.log(roomCode);
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: roomCode,
+      }),
+    };
+
+    const res = await fetch("/api/join-room", requestOptions);
+    const data = await res.json();
+
+    if (res.status !== 400) {
+      navigate(`/room/${roomCode}`);
+    } else {
+      setError("Room Not Found");
+    }
   };
 
   return (
