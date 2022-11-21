@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -11,6 +11,8 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const CreateRoomPage = () => {
+  const navigate = useNavigate();
+
   let defaultVotes = 2;
 
   const [initialState, setInitialState] = useState({
@@ -47,7 +49,7 @@ const CreateRoomPage = () => {
     const res = await fetch("/api/create-room", requestOptions);
     const data = await res.json();
 
-    console.log(data);
+    navigate(`/room/${data.code}`);
   };
 
   return (
