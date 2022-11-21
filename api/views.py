@@ -9,6 +9,8 @@ from .models import Room
 
 # Create your views here.
 
+# diplay all rooms
+
 
 class RoomView(generics.ListAPIView):
     # get all room objects
@@ -26,6 +28,7 @@ class RoomView(generics.ListAPIView):
 #     return Response(serializer_class.data)
 
 
+# create a room
 class CreateRoomView(APIView):
     serializer_class = CreateRoomSerializer
 
@@ -61,3 +64,29 @@ class CreateRoomView(APIView):
                 room.save()
 
             return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
+
+
+# get sepecific room
+class GetRoom(APIView):
+    serializer_class = RoomSerializer
+    # pass a parameter called code when fetching for room in the url
+    lookup_url_kwarg = 'code'
+
+    def get(self, request, format=None):
+        # get value of 'code' from the url
+        code = request.GET.get(self.lookup_url_kwarg)
+        # if code exists
+        if code != None:
+            # filter to find room exactly code as that of url
+            room = Room.objects.filter(code=code)
+            # check for room
+            if len(room) > 0:
+                data = RoomSerializer(room[0]).data
+                # check for host and add 'is_host' field
+                data['is_host'] = self.request.session.session_key == room[0].host
+                return Response(data, status=status.HTTP_200_OK)
+            # if no room is available
+            return Response({'Room Not Found: Invalid Room Code'}, status=status.HTTP_404_NOT_FOUND)
+
+        # if no code is present
+        return Response({'Bad Request': 'Code parameter not found in request'}, status=status.HTTP_400_BAD_REQUEST)
