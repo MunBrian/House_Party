@@ -11,4 +11,5 @@ class RoomSerializer(ModelSerializer):
 class CreateRoomSerializer(ModelSerializer):
     class Meta:
         model = Room
+        # serliaze request to make sure it is valid. Give back a python format
         fields = ('guest_can_pause', 'votes_to_skip')
