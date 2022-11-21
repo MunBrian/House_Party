@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -12,6 +12,44 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const CreateRoomPage = () => {
   let defaultVotes = 2;
+
+  const [initialState, setInitialState] = useState({
+    guestCanPause: true,
+    votesToSkip: defaultVotes,
+  });
+
+  const handleVotesChange = (e) => {
+    setInitialState((prevState) => ({
+      ...prevState,
+      votesToSkip: e.target.value,
+    }));
+  };
+
+  const handleGuestCanPauseChange = (e) => {
+    setInitialState((prevState) => ({
+      ...prevState,
+      guestCanPause: e.target.value === "true" ? true : false,
+    }));
+  };
+
+  const handleCreateRoom = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        votes_to_skip: initialState.votesToSkip,
+        guest_can_pause: initialState.guestCanPause,
+      }),
+    };
+
+    const res = await fetch("/api/create-room", requestOptions);
+    const data = await res.json();
+
+    console.log(data);
+  };
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">
@@ -24,7 +62,11 @@ const CreateRoomPage = () => {
           <FormHelperText>
             <div align="center">Guest Control of Playback State</div>
           </FormHelperText>
-          <RadioGroup row defaultValue="true">
+          <RadioGroup
+            row
+            defaultValue="true"
+            onChange={handleGuestCanPauseChange}
+          >
             <FormControlLabel
               value="true"
               control={<Radio color="primary" />}
@@ -43,6 +85,7 @@ const CreateRoomPage = () => {
       <Grid item xs={12} align="center">
         <FormControl>
           <TextField
+            onChange={handleVotesChange}
             required={true}
             type="number"
             defaultValue={defaultVotes}
@@ -57,7 +100,7 @@ const CreateRoomPage = () => {
         </FormControl>
       </Grid>
       <Grid item xs={12} align="center">
-        <Button color="primary" variant="contained">
+        <Button color="primary" variant="contained" onClick={handleCreateRoom}>
           Create a Room
         </Button>
       </Grid>
