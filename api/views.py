@@ -9,9 +9,8 @@ from .models import Room
 
 # Create your views here.
 
+
 # diplay all rooms
-
-
 class RoomView(generics.ListAPIView):
     # get all room objects
     queryset = Room.objects.all()
@@ -79,7 +78,7 @@ class JoinRoom(APIView):
             # if not create a seesion
             self.request.session.create()
 
-        # get code value from post request
+        # get code from post request
         code = request.data.get(self.lookup_url_kwarg)
 
         # if code exists
@@ -90,7 +89,7 @@ class JoinRoom(APIView):
             if len(room_result) > 0:
                 # get room
                 room = room_result[0]
-                # make key 'room_code' to show that user in current session is in the room
+                # make key 'room_code' in session to show that user in current session is in the room
                 self.request.session['room_code'] = code
                 return Response({'message': 'Room Joined!!'}, status=status.HTTP_200_OK)
             return Response({'Bad Request': 'Invalid Room Code!!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -98,7 +97,7 @@ class JoinRoom(APIView):
         return Response({'Bad Request': 'Invalid post data, did not find a code key '}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# get sepecific room
+# get sepecific room  using code
 class GetRoom(APIView):
     serializer_class = RoomSerializer
     # pass a parameter called code when fetching for room in the url
