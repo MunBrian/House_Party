@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
 from rest_framework import generics, status
@@ -121,3 +122,19 @@ class GetRoom(APIView):
 
         # if no code is present
         return Response({'Bad Request': 'Code parameter not found in request'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# check if user is in room
+class UserInRoom(APIView):
+    def get(self, request, format=None):
+        # check if user has active sesssion
+        if not self.request.session.exists(self.request.session.session_key):
+            # if not create a session
+            self.request.session.create()
+
+        data = {
+            'code': self.request.session.get('room_code')
+        }
+
+        # take a python dict and serialize it using a json-serializer and send to request
+        return JsonResponse(data, status=status.HTTP_200_OK)
