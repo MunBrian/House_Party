@@ -138,3 +138,30 @@ class UserInRoom(APIView):
 
         # take a python dict and serialize it using a json-serializer and send to request
         return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+# leave room func
+class LeaveRoom(APIView):
+    def post(self, request, format=None):
+        # check if user has active sesssion
+        if not self.request.session.exists(self.request.session.session_key):
+            # if not create a session
+            self.request.session.create()
+
+        # check if room code exist
+        if 'room_code' in self.request.session:
+            # remove room code from session
+            self.request.session.pop('room_code')
+            # get host id
+            host_id = self.request.session.session_key
+            # get room using host id
+            room_results = Room.objects.filter(host=host_id)
+
+            # check if room exist
+            if len(room_results) > 0:
+                room = room_results[0]
+                # delete room
+                room.delete()
+            return Response({'Room Not Found: Invalid Room Code'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'Message': 'Success'}, status=status.HTTP_200_OK)

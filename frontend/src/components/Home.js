@@ -4,7 +4,6 @@ import { Grid, Button, ButtonGroup, Typography } from "@material-ui/core";
 
 const Home = () => {
   const navigate = useNavigate();
-
   const [roomCode, setRoomCode] = useState("");
 
   useEffect(() => {
