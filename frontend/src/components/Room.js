@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Grid, Button, Typography } from "@material-ui/core";
+import CreateRoomPage from "./CreateRoomPage";
 
 const Room = () => {
   const params = useParams();
@@ -12,6 +13,7 @@ const Room = () => {
     votesToSkip: 2,
     guestCanPause: false,
     isHost: false,
+    showSettings: null,
   });
 
   const handleLeaveRoom = async () => {
@@ -47,39 +49,81 @@ const Room = () => {
     return () => getRoomDetails();
   }, []);
 
+  const handleSettingClick = (value) => {
+    setInitialState((prev) => ({
+      ...prev,
+      showSettings: value,
+    }));
+  };
+
   return (
     <>
-      <Grid container spacing={1}>
-        <Grid item xs={12} align="center">
-          <Typography variant="h4" component="h4">
-            Code: {roomCode}
-          </Typography>
+      {initialState.showSettings ? (
+        <>
+          <Grid container spacing={1}>
+            <Grid item xs={12} align="center">
+              <CreateRoomPage
+                update={true}
+                votesToSkip={initialState.votesToSkip}
+                guestCanPause={initialState.guestCanPause}
+                roomCode={roomCode}
+              />
+            </Grid>
+            <Grid item xs={12} align="center">
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => handleSettingClick(false)}
+              >
+                Close
+              </Button>
+            </Grid>
+          </Grid>
+        </>
+      ) : (
+        <Grid container spacing={1}>
+          <Grid item xs={12} align="center">
+            <Typography variant="h4" component="h4">
+              Code: {roomCode}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} align="center">
+            <Typography variant="h6" component="h6">
+              Votes: {initialState.votesToSkip}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} align="center">
+            <Typography variant="h6" component="h6">
+              Guest can Pause: {initialState.guestCanPause.toString()}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} align="center">
+            <Typography variant="h6" component="h6">
+              Host: {initialState.isHost.toString()}
+            </Typography>
+          </Grid>
+          {initialState.isHost && (
+            <Grid item xs={12} align="center">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleSettingClick(true)}
+              >
+                Settings
+              </Button>
+            </Grid>
+          )}
+          <Grid item xs={12} align="center">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleLeaveRoom}
+            >
+              Leave Room
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item xs={12} align="center">
-          <Typography variant="h6" component="h6">
-            Votes: {initialState.votesToSkip}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} align="center">
-          <Typography variant="h6" component="h6">
-            Guest can Pause: {initialState.guestCanPause.toString()}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} align="center">
-          <Typography variant="h6" component="h6">
-            Host: {initialState.isHost.toString()}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} align="center">
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleLeaveRoom}
-          >
-            Leave Room
-          </Button>
-        </Grid>
-      </Grid>
+      )}
     </>
   );
 };
