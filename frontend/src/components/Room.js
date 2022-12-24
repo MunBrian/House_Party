@@ -16,6 +16,23 @@ const Room = () => {
     showSettings: null,
   });
 
+  const getRoomDetails = async () => {
+    const res = await fetch(`/api/get-room?code=${roomCode}`);
+    const data = await res.json();
+
+    if (res.status != 404) {
+      //update state
+      setInitialState({
+        votesToSkip: data.votes_to_skip,
+        guestCanPause: data.guest_can_pause,
+        isHost: data.is_host,
+      });
+    } else {
+      //redirect to home page
+      navigate("/");
+    }
+  };
+
   const handleLeaveRoom = async () => {
     const requestOptions = {
       method: "POST",
@@ -29,32 +46,18 @@ const Room = () => {
     navigate("/");
   };
 
-  useEffect(() => {
-    const getRoomDetails = async () => {
-      const res = await fetch(`/api/get-room?code=${roomCode}`);
-      const data = await res.json();
-
-      if (res.status == 404) {
-        navigate("/");
-      } else {
-        //update state
-        setInitialState({
-          votesToSkip: data.votes_to_skip,
-          guestCanPause: data.guest_can_pause,
-          isHost: data.is_host,
-        });
-      }
-    };
-
-    return () => getRoomDetails();
-  }, []);
-
   const handleSettingClick = (value) => {
     setInitialState((prev) => ({
       ...prev,
       showSettings: value,
     }));
   };
+
+  useEffect(() => {
+    getRoomDetails();
+
+    return () => getRoomDetails();
+  }, []);
 
   return (
     <>
@@ -73,7 +76,9 @@ const Room = () => {
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => handleSettingClick(false)}
+                onClick={() => {
+                  handleSettingClick(false), getRoomDetails();
+                }}
               >
                 Close
               </Button>

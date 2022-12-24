@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from .serializers import RoomSerializer, CreateRoomSerializer, UpdateRoomSerializer
 from .models import Room
 
-# Create your views here.
 
+# Create your views here.
 
 # diplay all rooms
 class RoomView(generics.ListAPIView):
@@ -202,7 +202,7 @@ class UpdateRoom(APIView):
             # update room
             room.guest_can_pause = guest_can_pause
             room.votes_to_skip = votes_to_skip
-            room.save(update_fields=['guest_can_pause', 'votes_too_skip'])
+            room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
 
             # send response
             return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
